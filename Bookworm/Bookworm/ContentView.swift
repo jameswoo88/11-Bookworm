@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.managedObjectContext) var moc
     @FetchRequest(entity: Book.entity(), sortDescriptors: [
+        NSSortDescriptor(keyPath: \Book.date, ascending: false),
         NSSortDescriptor(keyPath: \Book.title, ascending: true),
         NSSortDescriptor(keyPath: \Book.author, ascending: true)
     ]) var books: FetchedResults<Book>
@@ -24,11 +25,23 @@ struct ContentView: View {
                         EmojiRatingView(rating: book.rating)
                             .font(.largeTitle)
                         
-                        VStack(alignment: .leading) {
-                            Text(book.title ?? "Unknown title")
-                                .font(.headline)
-                            Text(book.author ?? "Unknown author")
-                                .foregroundColor(.secondary)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(book.title ?? "Unknown title")
+                                    .font(.headline)
+                                    .foregroundColor(book.rating == 1 ? .red : .black)
+                                    .lineLimit(1)
+                                Text(book.author ?? "Unknown author")
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(formattToString(date: book.date))
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .alignmentGuide(.leading) { d in d[.trailing] }
                         }
                     }
                 }
@@ -53,6 +66,17 @@ struct ContentView: View {
         }
         
         try? moc.save()
+    }
+    
+    func formattToString(date: Date?) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        
+        if let date = date {
+            return formatter.string(from: date)
+        } else {
+            return "unknown date"
+        }
     }
     
 }//End of struct

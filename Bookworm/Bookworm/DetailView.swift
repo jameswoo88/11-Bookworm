@@ -41,6 +41,17 @@ struct DetailView: View {
                 
                 StarRatingView(rating: .constant(Int(self.book.rating)))
                     .font(.largeTitle)
+                    .padding()
+                
+                if let date = self.book.date {
+                    Text("Added on: \(formatToString(date: date))")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                } else {
+                    Text("Added on: unknown date")
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                }
                 
                 Spacer()
             }
@@ -64,6 +75,14 @@ struct DetailView: View {
         // try? self.moc.save()
         
         presentationMode.wrappedValue.dismiss()
+    }
+    
+    func formatToString(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        
+        return formatter.string(from: date)
     }
     
 }//End of struct
